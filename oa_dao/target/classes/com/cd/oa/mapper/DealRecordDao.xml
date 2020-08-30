@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="com.cd.oa.dao.DealRecordDao">
+    <resultMap id="dealRecord" Type="DeealRecord">
+        <id property="id" column="id" javaType="int"/>
+        <result property="claimVoucherId" column="claim_voucher_id" javaType="int"/>
+        <result property="dealId" column="deal_id" javaType="String"/>
+        <result property="dealTime" column="deal_time" javaType="Date"/>
+        <result property="dealType" column="deal_type" javaType="String"/>
+        <result property="dealResult" column="deal_result" javaType="String"/>
+        <result property="comment" column="comment" javaType="String"/>
+        <association property="dealer" column="deal_id" javaType="Employee">
+            <id property="id" column="id" javaType="int"/>
+            <result property="name" column="name" javaType="String"/>
+            <result property="post" column="post" javaTYpe="String"/>
+        </association>
+    </resultMap>
+
+    <insert id="insert" parameterType="dealRecord">
+        insert into deal_record values(#{claimVoucherId},#{dealId},#{dealTime},#{dealType},#{dealResult},#{comment})
+    </insert>
+
+    <select id="selectByClaimVoucher" parameterType="int" resultMap="dealRecord">
+        select d.*,e.name dname,e.post dpost
+        from deal_record d
+        left join employee e on d.deal_id=e.id
+        where d.claim_voucher_id=#{claimVoucherId}
+        order by d.deal_time
+    </select>
+
+</mapper>

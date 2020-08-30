@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="com.cd.oa.dao.ClaimVoucherDao">
+    <resultMap id="claimVoucher" type="ClaimVoucher">
+        <!--主键字段用id，非主键字段用result配置 property:实体类属性名 column:表字段名-->
+        <id property="id" column="id" javaType="int" />
+        <result property="cause" column="cause" javaType="String"/>
+        <result property="createId" column="createId" javaType="String"/>
+        <result property="createTime" column="createTime" javaType="Date"/>
+        <result property="nextDealId" column="nextDealId" javaType="String"/>
+        <result property="totalAmount" column="total_amount" javaType="Double"/>
+        <result property="status" column="status" javaType="String"/>
+        <association property="creator" column="create_id" jevaType="Employee">
+            <result porperty="name" column="cname" javaType="String"/>
+            <result property="post" column="cpost" javaType="String"/>
+        </association>
+        <association property="dealer" column="next_deal_id" javaType="Employee">
+            <result property="name" column="dname" javaType="String"/>
+            <result property="post" column="dpost" javaType="String"/>
+        </association>
+    </resultMap>
+
+    <insert id="add" parameterType="ClaimVoucher">
+        insert into claim_voucher values(#{cause},#{createId},#{createTime},#{nextDealId},#{totalAmount},#{status})
+    </insert>
+
+    <update id="update" parameterType="ClaimVoucher">
+        update claim_voucher
+        set cause=#{cause},createId=#{createId},createTime=#{createTime},nextDealId=#{nextDealId},totalAmount=#{totalAmount},status=#{status}
+        where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="Integer">
+        delete *from claim_voucher where id=#{id}
+    </delete>
+
+    <select id="select" parameterType="Integer" resultMap="claimVoucher">
+        SELECT c.*,e.name cname,e.post cpost,de.name dname,de.post dpost
+        FROM claim_voucher c
+        left join employee e on c.create_id=e.id
+        left join employee de on c.next_deal_id=de.id
+        where c.id=#{id}
+    </select>
+
+    <select id="selectByCreateId" parameterType="String" resultMap="claimVoucher">
+        SELECT c.*,e.name cname,e.post cpost,de.name dname,de.post dpost
+        FROM claim_voucher c
+        left join employee e on c.create_id=e.id
+        left join employee de on c.next_deal_id=de.id
+        where c.create_id=#{createId}
+        order by c.createTime desc
+    </select>
+
+    <select id="selectByCreateId" parameterType="String" resultMap="claimVoucher">
+        SELECT c.*,e.name cname,e.post cpost,de.name dname,de.post dpost
+        FROM claim_voucher c
+        left join employee e on c.create_id=e.id
+        left join employee de on c.next_deal_id=de.id
+        where c.next_deal_id=#{nextDealId}
+        order by c.createTime desc
+    </select>
+</mapper>

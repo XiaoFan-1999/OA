@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapper namespace="com.cd.oa.dao.EmployeeDao">
+    <resultMap id="employee" Type="Employee">
+        <!--主键字段用id，非主键字段用result配置 property:实体类属性名 column:表字段名-->
+        <id property="id" column="id" javaType="String"/>
+        <result property="password" column="password" javaType="String"/>
+        <result property="name" column="name" javaType="String"/>
+        <result property="department_id" column="department_id" javaType="String"/>
+        <result property="post" column="post" javaType="String"/>
+        <!--管理部门的结果集，用association标签配置-->
+        <association property="department" column="department_id" javaType="Deparment">
+            <id property="id" column="did" javaType="String"/>
+            <result property="name" column="dname" javaType="String"/>
+        </association>
+    </resultMap>
+
+    <insert id="add" parameterType="Employee">
+        insert into employee values(#{password},#{name},#{department_id},#{post})
+    </insert>
+
+    <update id="update" parameterType="Employee">
+        update employee
+        set name=#{name},password=#{password},department=#{department_id},post=#{post}
+        where id=#{id}
+    </update>
+
+    <delete id="delete" parameterType="String">
+        delete *from employee where id=#{id}
+    </delete>
+
+    <select id="select" parameterType="String" resultMap="employee">
+        select e.*,d.id did,d.name dname
+        from employee e
+        left join department d on e.department_id=d.id
+        where e.id=#{id}
+    </select>
+
+    <select id="selectAll" resultMap="employee">
+        select e.*,d.id did,d.name dname
+        from employee e
+        left join department d on e.department_id=d.id
+    </select>
+
+    <select id="selectByDepartmentAndPost" resultMap="employee">
+        select e.*,d.id did,d.name dname
+        from employee e
+        left join department d on d.id=e.department_id
+        <where>
+            <if test="did != null and did != ''">
+                and d.id=#{department_id}
+            </if>
+            <if test="post != null and post != ''">
+                and e.post=#{post}
+            </if>
+        </where>
+    </select>
+</mapper>
